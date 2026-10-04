@@ -2,7 +2,7 @@
   "hosting": [
     {
       "target": "pricesnap",
-      "public": ".",
+      "public": "public",
       "ignore": [
         "firebase.json",
         "**/.*",

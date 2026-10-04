@@ -9,14 +9,14 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = 3000;
 
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Start backend server and seed Firestore database if empty
 app.listen(PORT, '0.0.0.0', async () => {
   console.log(`Server running at http://0.0.0.0:${PORT}`);
 
   // Auto-seed Firestore database if config exists
-  const configPath = path.join(__dirname, 'firebase-applet-config.json');
+  const configPath = path.join(__dirname, '../firebase-applet-config.json');
   if (fs.existsSync(configPath)) {
     try {
       const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));

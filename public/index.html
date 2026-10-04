@@ -6,9 +6,31 @@
   <meta name="theme-color" content="#060807">
   <title>PriceSnap — AI resale valuations for New Zealand</title>
   <meta name="description" content="Snap it. Price it. Sell smarter. Discover PriceSnap, the Android app for AI-assisted resale estimates in NZD, condition insights and comparable market evidence.">
+  <meta name="keywords" content="resale value NZ, AI pricing app, second hand price New Zealand, PriceSnap Android">
   <meta property="og:type" content="website">
   <meta property="og:title" content="PriceSnap — Snap it. Price it. Sell smarter.">
   <meta property="og:description" content="A clearer starting point for your next sale. AI-assisted resale valuations, made for New Zealand.">
+  <meta property="og:image" content="assets/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PriceSnap — AI Resale Valuations NZ">
+  <meta name="twitter:description" content="Turn a photo into an AI-assisted resale estimate in NZD.">
+  
+  <!-- Structured Data for SEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "PriceSnap",
+    "operatingSystem": "Android",
+    "applicationCategory": "ShoppingApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "NZD"
+    },
+    "description": "AI-assisted resale valuations for the New Zealand market."
+  }
+  </script>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -57,14 +79,14 @@
   <section id="trust" class="section trust-section"><div class="wrap"><div class="section-heading"><p class="eyebrow">A LITTLE CLARITY GOES A LONG WAY</p><h2>Useful insight. Honest limits.</h2></div><div class="trust-grid"><article><h3>Estimates, not promises</h3><p>AI can misidentify items or miss details. Check the result and compare current listings before you set a price.</p></article><article><h3>Keep photos focused</h3><p>Photograph the item without personal documents, faces or address details in the background.</p></article><article><h3>Know what you share</h3><p>Review the app’s Data safety and privacy information on Google Play before uploading photos.</p><a href="/privacy.html">Read full privacy policy</a></article></div></div></section>
 
   <!-- Live Showcase from Firestore -->
-  <section id="live-snaps" class="section wrap" style="border-top: 1px solid var(--line); padding-top: 80px;">
+  <section id="live-snaps" class="section wrap live-snaps-section">
     <div class="section-heading">
       <p class="eyebrow">AOTEAROA'S RECENT VALUATIONS</p>
       <h2>What Kiwis are Snapping</h2>
       <p>A live view of featured resale appraisals from the community database.</p>
     </div>
-    <div id="live-snaps-grid" class="steps">
-      <div style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 40px 0;">
+    <div id="live-snaps-grid" class="steps" aria-live="polite">
+      <div class="loading-state">
         <span class="spark" aria-hidden="true" style="animation: spin 2s linear infinite; display: inline-block; font-size: 24px; margin-bottom: 12px;">✧</span>
         <p>Connecting to PriceSnap Aotearoa DB...</p>
       </div>
@@ -72,26 +94,33 @@
   </section>
 
   <!-- Contact Form -> Firestore supportRequests -->
-  <section id="contact" class="section wrap" style="border-top: 1px solid var(--line); padding-top: 80px;">
+  <section id="contact" class="section wrap contact-section">
     <div class="section-heading">
       <p class="eyebrow">HAVE A QUESTION?</p>
       <h2>Get in Touch</h2>
       <p>Have some feedback or need help with PriceSnap? Send us a direct message.</p>
     </div>
-    <div class="valuation-card" style="max-width: 600px; margin: 0 auto;">
-      <form id="contact-form" style="display: flex; flex-direction: column; gap: 20px;">
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          <label for="contact-email" style="font-size: 12px; font-weight: 700; color: #a4ecba; letter-spacing: 1px; text-transform: uppercase;">Email Address</label>
-          <input type="email" id="contact-email" required placeholder="kiaora@example.nz" style="background: #101411; border: 1px solid var(--line); border-radius: 8px; padding: 14px; color: var(--text); font-family: inherit; font-size: 15px; width: 100%; box-sizing: border-box; outline: none; transition: border-color 0.2s;">
+    <div class="contact-card">
+      <form id="contact-form">
+        <!-- Honeypot field to prevent spam -->
+        <div class="hp-field">
+          <label for="website_url">If you are human, leave this blank</label>
+          <input type="text" id="website_url" name="website_url" tabindex="-1" autocomplete="off">
         </div>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          <label for="contact-message" style="font-size: 12px; font-weight: 700; color: #a4ecba; letter-spacing: 1px; text-transform: uppercase;">Message</label>
-          <textarea id="contact-message" required rows="5" placeholder="Tell us how we can help..." style="background: #101411; border: 1px solid var(--line); border-radius: 8px; padding: 14px; color: var(--text); font-family: inherit; font-size: 15px; width: 100%; box-sizing: border-box; resize: vertical; outline: none; transition: border-color 0.2s;"></textarea>
+
+        <div class="form-group">
+          <label for="contact-email">Email Address</label>
+          <input type="email" id="contact-email" name="email" required placeholder="kiaora@example.nz">
         </div>
-        <button type="submit" class="button" style="width: 100%; cursor: pointer; border: none; font-size: 16px;">Send Message</button>
-        <div id="contact-status" style="font-size: 14px; text-align: center; padding-top: 10px; font-weight: 600;"></div>
+        <div class="form-group">
+          <label for="contact-message">Message</label>
+          <textarea id="contact-message" name="message" required rows="5" placeholder="Tell us how we can help..."></textarea>
+        </div>
+        <button type="submit" class="button">Send Message</button>
+        <div id="contact-status" role="status"></div>
       </form>
     </div>
+  </section>
   </section>
 
   <section id="faq" class="section wrap faq-layout"><div><p class="eyebrow">GOOD QUESTIONS</p><h2>A few things<br>worth knowing.</h2><p>A little context before your first snap.</p></div><div class="faq-list"><details><summary>What is PriceSnap?</summary><p>PriceSnap is an Android app for AI-assisted resale valuations, with a focus on New Zealand. It helps identify an item from a photo and provides context for an estimated resale value in NZD.</p></details><details><summary>Is the valuation a guaranteed selling price?</summary><p>No. It is an estimate to help you choose a starting price. Actual sale prices depend on condition, demand, location, timing and how you sell. Verify the item details and compare current market evidence.</p></details><details><summary>What does the confidence score mean?</summary><p>It provides a signal of uncertainty around the estimate. It is not an accuracy guarantee or the probability that your item will sell. Review the supporting details, especially when evidence is limited.</p></details><details><summary>What makes a good photo?</summary><p>Use good light and a plain background. Keep the whole item visible and capture the brand or model label and signs of wear. Avoid including personal information in your photos.</p></details><details><summary>Does PriceSnap buy or sell my items?</summary><p>PriceSnap helps you research a resale price. You choose where to list the item and agree a final price with a buyer.</p></details><details><summary>Where can I check pricing and device compatibility?</summary><p>The Google Play listing has the current availability, pricing and Android compatibility details. <a href="https://play.google.com/store/apps/details?id=dev.lukeponga.pricesnap">View PriceSnap on Google Play.</a></p></details><details><summary>Where can I find privacy and data deletion information?</summary><p>Open the app’s Google Play listing and review its Data safety, privacy policy and developer contact information for the current data-handling and deletion options.</p></details></div></section>

@@ -5,7 +5,7 @@
 @media(max-width:760px){.hero h1 br:nth-of-type(1){display:block}}
 
 /* Green and black brand palette. */
-:root{--bg:#060807;--surface:#101411;--text:#f4f8f5;--muted:#b1bcb4;--line:#28352d}
+:root{--bg:#060807;--surface:#101411;--text:#f4f8f5;--muted:#b1bcb4;--line:#28352d;--accent-color:#a4ecba;--accent-hover:#66f29d}
 .site-header{background:#060807f5}
 .brand-icon,.mini-logo{background:linear-gradient(135deg,#66f29d,#30ce75);color:#06180d}
 .button,.button-small{background:#66ed96;color:#071c0e;border-color:#8afaad45}
@@ -13,3 +13,83 @@
 .gradient{background-image:linear-gradient(105deg,#9cfcba 10%,#32d777 90%)}
 ::selection{background:#59dd8b;color:#06180d}
 @media(forced-colors:active){.gradient{background:none;color:CanvasText}}
+
+/* Refactored Components */
+.live-snaps-section, .contact-section {
+  border-top: 1px solid var(--line);
+  padding-top: 80px;
+}
+
+.loading-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--muted);
+  padding: 40px 0;
+}
+
+.contact-card {
+  max-width: 600px;
+  margin: 0 auto;
+  border: 1px solid #74857950;
+  border-radius: 20px;
+  background: linear-gradient(120deg,#161c17,#131814);
+  padding: 28px;
+  box-shadow: 0 24px 65px #0003;
+}
+
+#contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-color);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.form-group input, .form-group textarea {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 15px;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus, .form-group textarea:focus {
+  border-color: var(--accent-hover);
+}
+
+#contact-form .button {
+  width: 100%;
+  cursor: pointer;
+  border: none;
+  font-size: 16px;
+}
+
+#contact-status {
+  font-size: 14px;
+  text-align: center;
+  padding-top: 10px;
+  font-weight: 600;
+}
+
+.hp-field {
+  display: none; /* Honeypot: hidden from humans, visible to bots */
+}
+
