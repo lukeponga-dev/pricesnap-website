@@ -1,0 +1,61 @@
+{
+  "entities": {
+    "supportRequests": {
+      "title": "Support Request",
+      "description": "Contact messages from website users",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 1024
+        },
+        "createdAt": {
+          "type": "string"
+        }
+      },
+      "required": ["email", "message", "createdAt"]
+    },
+    "publicSnaps": {
+      "title": "Public Valuation Snapshot",
+      "description": "AI resale estimation showcase shown on the landing page",
+      "type": "object",
+      "properties": {
+        "itemName": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "condition": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "estimatedMin": {
+          "type": "number"
+        },
+        "estimatedMax": {
+          "type": "number"
+        },
+        "confidence": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string"
+        }
+      },
+      "required": ["itemName", "condition", "estimatedMin", "estimatedMax", "confidence", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/supportRequests/{requestId}": {
+      "schema": "supportRequests",
+      "description": "Customer support messages submitted through the site"
+    },
+    "/publicSnaps/{snapId}": {
+      "schema": "publicSnaps",
+      "description": "Featured AI appraisal snaps shown on the page"
+    }
+  }
+}
