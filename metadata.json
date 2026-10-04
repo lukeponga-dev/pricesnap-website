@@ -1,0 +1,8 @@
+{
+  "name": "PriceSnap Website",
+  "description": "High-performance landing page for PriceSnap, an AI-assisted resale valuation app for New Zealand.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

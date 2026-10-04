@@ -9,14 +9,33 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = 3000;
 
-app.use(express.static(path.join(__dirname, '../public')));
+const publicDir = path.join(__dirname, '../public');
+
+app.use(express.static(publicDir));
+
+// Clean URL rewrites matching firebase.json
+app.get('/privacy', (req, res) => {
+  res.sendFile(path.join(publicDir, 'privacy.html'));
+});
+
+app.get('/data-deletion', (req, res) => {
+  res.sendFile(path.join(publicDir, 'data-deletion.html'));
+});
+
+// Explicitly serve firebase-manager.js if requested
+app.get('/firebase-manager.js', (req, res) => {
+  res.sendFile(path.join(publicDir, 'firebase-manager.js'));
+});
 
 // Start backend server and seed Firestore database if empty
 app.listen(PORT, '0.0.0.0', async () => {
   console.log(`Server running at http://0.0.0.0:${PORT}`);
 
   // Auto-seed Firestore database if config exists
-  const configPath = path.join(__dirname, '../firebase-applet-config.json');
+  const configPath = fs.existsSync(path.join(publicDir, 'firebase-applet-config.json'))
+    ? path.join(publicDir, 'firebase-applet-config.json')
+    : path.join(__dirname, '../firebase-applet-config.json');
+
   if (fs.existsSync(configPath)) {
     try {
       const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
