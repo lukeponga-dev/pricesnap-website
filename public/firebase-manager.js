@@ -1,42 +1,49 @@
 // Firebase Client Manager for PriceSnap Website
-const OperationType = {
-  CREATE: 'create',
-  UPDATE: 'update',
-  DELETE: 'delete',
-  LIST: 'list',
-  GET: 'get',
-  WRITE: 'write',
-};
-
 let db = null;
+let databaseProvisioned = null;
 
-// Error handler specified by Firebase Integration Skill guidelines
-function handleFirestoreError(error, operationType, path) {
-  const errInfo = {
-    error: error instanceof Error ? error.message : String(error),
-    authInfo: {
-      userId: null, // Client-side public user
-      email: null,
-      emailVerified: null,
-      isAnonymous: true,
-      tenantId: null,
-      providerInfo: []
-    },
-    operationType,
-    path
-  };
-  console.error('Firestore Error: ', JSON.stringify(errInfo));
-  throw new Error(JSON.stringify(errInfo));
+// Check if the Firestore database exists before invoking the Firestore SDK
+async function isFirestoreProvisioned(projectId, databaseId = '(default)') {
+  if (databaseProvisioned !== null) return databaseProvisioned;
+  try {
+    const res = await fetch(`https://firestore.googleapis.com/v1/projects/${projectId}/databases/${databaseId}/documents`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    // If the database does not exist, Google Cloud returns 404
+    databaseProvisioned = (res.status !== 404);
+    return databaseProvisioned;
+  } catch (e) {
+    databaseProvisioned = false;
+    return false;
+  }
 }
 
 // Initialize Firebase dynamically by loading config
-async function initFirebase() {
+export async function initFirebase() {
+  if (db) return db;
+
   try {
     const response = await fetch('/firebase-applet-config.json');
-    if (!response.ok) throw new Error('Could not load Firebase configuration');
+    if (!response.ok) {
+      console.info('Firebase configuration not found. PriceSnap running in offline concept preview mode.');
+      return null;
+    }
     const firebaseConfig = await response.json();
+    if (!firebaseConfig || !firebaseConfig.projectId) return null;
 
-    // Import from Firebase ESM CDNs
+    const dbId = (firebaseConfig.firestoreDatabaseId && firebaseConfig.firestoreDatabaseId !== '(default)')
+      ? firebaseConfig.firestoreDatabaseId
+      : '(default)';
+
+    // Verify database existence on Google Cloud before starting gRPC streams
+    const isReady = await isFirestoreProvisioned(firebaseConfig.projectId, dbId);
+    if (!isReady) {
+      console.info(`Firestore database "${dbId}" is not yet provisioned on project "${firebaseConfig.projectId}". PriceSnap running in offline concept showcase mode.`);
+      return null;
+    }
+
+    // Import from Firebase ESM CDNs only when database is ready
     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js");
     const { getFirestore: firestoreInit } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
 
@@ -45,21 +52,11 @@ async function initFirebase() {
       ? firebaseConfig.firestoreDatabaseId
       : undefined;
     db = databaseId ? firestoreInit(app, databaseId) : firestoreInit(app);
-    console.log('PriceSnap Firebase initialized successfully.');
-
-    // Validate connection per skill instructions
-    try {
-      const { doc, getDocFromServer } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
-      await getDocFromServer(doc(db, 'test', 'connection'));
-    } catch (error) {
-      if (error instanceof Error && error.message.includes('the client is offline')) {
-        console.error("Please check your Firebase configuration.");
-      }
-    }
+    console.log('PriceSnap Firebase client connected to live database.');
 
     return db;
   } catch (error) {
-    console.error('Failed to initialize Firebase:', error);
+    console.info('PriceSnap Firebase initialization notice:', error instanceof Error ? error.message : error);
     return null;
   }
 }
@@ -67,17 +64,19 @@ async function initFirebase() {
 // Add a customer support message
 export async function submitSupportRequest(email, message) {
   if (!db) db = await initFirebase();
-  if (!db) return { success: false, error: 'Database offline' };
+  if (!db) {
+    return {
+      success: false,
+      error: 'The live contact database is awaiting cloud activation. Please email developmentdesignsltd@gmail.com directly.'
+    };
+  }
 
-  const { collection, doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+  const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
   
-  // Safe validation per blueprint constraints
-  if (!email || email.length > 128) return { success: false, error: 'Invalid email' };
+  if (!email || email.length > 128) return { success: false, error: 'Invalid email address' };
   if (!message || message.length > 1024) return { success: false, error: 'Message exceeds limit' };
 
-  // Generate safe alphanumeric ID to prevent poisoning
   const requestId = 'req_' + Math.random().toString(36).substr(2, 9);
-  const path = `supportRequests/${requestId}`;
 
   const payload = {
     email: email.trim(),
@@ -89,8 +88,11 @@ export async function submitSupportRequest(email, message) {
     await setDoc(doc(db, 'supportRequests', requestId), payload);
     return { success: true };
   } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, path);
-    return { success: false, error: error.message };
+    console.warn('Support request error:', error);
+    return {
+      success: false,
+      error: 'Unable to send message to database right now. Please email developmentdesignsltd@gmail.com.'
+    };
   }
 }
 
@@ -111,22 +113,7 @@ export async function getRecentSnaps() {
     });
     return snaps;
   } catch (error) {
-    handleFirestoreError(error, OperationType.LIST, path);
+    console.info("Live snaps query unavailable from database. Showing concept previews.");
     return [];
   }
 }
-
-// Seed mock snaps dynamically into the database if empty (requires admin auth / setup, so let's check or handle gracefully)
-export async function seedMockSnapsIfEmpty() {
-  if (!db) db = await initFirebase();
-  if (!db) return;
-
-  const snaps = await getRecentSnaps();
-  if (snaps.length > 0) return; // Already populated
-
-  // Fallback / seed items to keep the showcase looking beautiful
-  console.log("No live featured snaps found in Firestore database. Displaying default mock showcase.");
-}
-
-// Trigger initial connection
-initFirebase();

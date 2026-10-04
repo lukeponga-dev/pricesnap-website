@@ -2,6 +2,31 @@
 <html lang="en-NZ">
 <head>
   <meta charset="utf-8">
+  <script>
+    (function() {
+      const origError = console.error;
+      console.error = function(...args) {
+        const msg = args.map(a => (typeof a === 'object' && a !== null ? (a.message || JSON.stringify(a)) : String(a))).join(' ');
+        if (msg.includes('MetaMask') || msg.includes('ethereum') || msg.includes('extension://')) return;
+        origError.apply(console, args);
+      };
+      window.addEventListener('error', function(e) {
+        const msg = e.message || '';
+        const src = e.filename || '';
+        if (msg.includes('MetaMask') || msg.includes('ethereum') || src.includes('extension://')) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+        }
+      }, true);
+      window.addEventListener('unhandledrejection', function(e) {
+        const reason = e.reason ? (e.reason.message || String(e.reason)) : '';
+        if (reason.includes('MetaMask') || reason.includes('ethereum')) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+        }
+      }, true);
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Privacy Policy — PriceSnap</title>
   <meta name="description" content="Privacy Policy for PriceSnap, covering how we process information for AI-assisted resale valuations.">
@@ -13,7 +38,7 @@
   <div class="wrap nav-row">
     <a class="brand" href="/" aria-label="PriceSnap home"><span class="brand-icon" aria-hidden="true">P</span>Price<span>Snap</span></a>
     <nav aria-label="Main navigation"><a href="/#how-it-works">How it works</a><a href="/#inside">Inside PriceSnap</a><a href="/#faq">FAQs</a></nav>
-    <a class="button button-small" href="https://play.google.com/store/apps/details?id=dev.lukeponga.pricesnap">Get the app</a>
+    <a class="button button-small" href="https://play.google.com/store/apps/details?id=dev.lukeponga.pricesnap" target="_blank" rel="noopener noreferrer">Get the app</a>
   </div>
 </header>
 <main id="main" class="wrap" style="padding-block: 60px;">
@@ -67,7 +92,7 @@
 <footer class="wrap footer">
     <a class="brand" href="/" aria-label="PriceSnap home"><span class="brand-icon" aria-hidden="true">P</span>Price<span>Snap</span></a>
     <p>© 2026 PriceSnap. All rights reserved.</p>
-    <nav aria-label="Footer navigation"><a href="/privacy.html">Privacy policy</a><a href="/data-deletion.html">Data deletion</a><a href="/#faq">FAQs</a><a href="https://play.google.com/store/apps/details?id=dev.lukeponga.pricesnap">Google Play</a></nav>
+    <nav aria-label="Footer navigation"><a href="/privacy.html">Privacy policy</a><a href="/data-deletion.html">Data deletion</a><a href="/#faq">FAQs</a><a href="https://play.google.com/store/apps/details?id=dev.lukeponga.pricesnap" target="_blank" rel="noopener noreferrer">Google Play</a></nav>
 </footer>
 </body>
 </html>
